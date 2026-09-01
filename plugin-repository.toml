@@ -1,0 +1,8 @@
+schema_version = "1"
+name = "DeterminFlow Community Plugins"
+
+# 社区 Plugin 通过 Pull Request 审核后，在这里添加 [[plugins]] 条目。
+# 示例：
+# [[plugins]]
+# id = "example-plugin"
+# subdirectory = "plugins/example-plugin"

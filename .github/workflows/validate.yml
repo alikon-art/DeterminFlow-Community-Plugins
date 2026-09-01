@@ -1,0 +1,41 @@
+name: Validate Community Plugins
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  repository:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      DETERMINFLOW_CORE_REF: ceea31c932dea68b9fff73b39fb457a52f47a188
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          repository: alikon-art/DeterminFlow
+          ref: ${{ env.DETERMINFLOW_CORE_REF }}
+          path: determinflow
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: determinflow/requirements-dev.lock
+      - name: Install public Core validation dependencies
+        run: python3 -m pip install -r determinflow/requirements-dev.lock
+      - name: Validate repository metadata and Plugin layout
+        run: python3 scripts/validate_repository.py
+      - name: Run public Core Plugin preflight
+        env:
+          DETERMINFLOW_CORE_ROOT: ${{ github.workspace }}/determinflow
+        run: python3 scripts/validate_with_core.py
+      - name: Test validator
+        run: python3 -m unittest discover -s tests
+      - name: Check Python syntax
+        run: python3 -m compileall -q scripts tests plugins
+      - name: Check whitespace
+        run: git diff --check 4b825dc642cb6eb9a060e54bf8d69288fbee4904 HEAD
