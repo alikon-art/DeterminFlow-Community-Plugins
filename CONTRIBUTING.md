@@ -14,6 +14,9 @@
    `git diff --check`。
 5. 在 Pull Request 中披露权限影响、外部通信、数据处理、依赖、迁移和测试结果。
 
+只改上述单个 Plugin 目录和仓库索引、且校验通过的投稿会自动合并。不要在同一
+个 Pull Request 里改 `.github/`、`scripts/` 或其他基础设施；那些改动不会自动合并。
+
 `determinflow-*` 品牌前缀，以及 `bishu-novel`、`public-api`、`hindsight-memory`、
 `novel-teardown` 等官方或已知产品 ID 均为保留名称，社区投稿不得使用。
 

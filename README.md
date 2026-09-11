@@ -195,6 +195,12 @@ git diff --check
 
 ### 5. 发起 Pull Request
 
+校验通过后，只改一个 `plugins/<plugin-id>/` 目录以及 `plugin-repository.toml`
+的投稿会自动 squash 合并，不会再等人审代码。改 `.github/`、`scripts/`、许可证或
+其他仓库基础设施的 Pull Request 不会自动合并。
+
+自动合并只表示结构校验和 Core 预检通过，不是安全审查。维护者仍可事后下架。
+
 一个 Pull Request 原则上只新增或更新一个 Plugin。首次提交至少包含：
 
 - 可审查源码和完整许可证；

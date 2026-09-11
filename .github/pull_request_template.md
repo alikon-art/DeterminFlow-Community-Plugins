@@ -22,6 +22,7 @@
 ## Checklist
 
 - [ ] 一个 Pull Request 只新增或更新一个 Plugin。
+- [ ] 没有修改 `.github/`、`scripts/` 或其他仓库基础设施。
 - [ ] `extension.toml`、目录名和 `plugin-repository.toml` 使用同一个 Plugin ID。
 - [ ] Plugin 目录包含 README、完整 LICENSE、测试或可重复验证步骤。
 - [ ] 已运行 `python3.11 scripts/validate_repository.py`。
