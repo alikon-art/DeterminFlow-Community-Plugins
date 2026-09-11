@@ -6,3 +6,7 @@ name = "DeterminFlow Community Plugins"
 # [[plugins]]
 # id = "example-plugin"
 # subdirectory = "plugins/example-plugin"
+
+[[plugins]]
+id = "taixu-codex-bridge"
+subdirectory = "plugins/taixu-codex-bridge"
