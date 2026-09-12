@@ -2,7 +2,7 @@
 
 在 DeterminFlow 中使用**你自己登录的官方 Codex CLI 账户**。通过插件仓库安装，不需要 Codex 桌面应用，不提供共享账户或共享额度。
 
-**0.3.9 预览版：仅 macOS Apple Silicon。** 基于 DeterminFlow Desktop 1.1.0 / Core `9db9d98c` 的扩展接口，固定官方 Codex CLI `0.153.4`。其他 Core、CLI 版本、Intel Mac、Windows、Linux 尚未验收。此项目不是 OpenAI 或 DeterminFlow 官方插件。
+**0.3.10 预览版：仅 macOS Apple Silicon。** 基于 DeterminFlow Desktop 1.1.0 / Core `9db9d98c` 的扩展接口，固定官方 Codex CLI `0.153.4`。其他 Core、CLI 版本、Intel Mac、Windows、Linux 尚未验收。此项目不是 OpenAI 或 DeterminFlow 官方插件。
 
 工作流推理强度优先级：任务显式覆盖 → agent 自身设置 → Main 默认 → `high`。0.3.1 修复了 Main 强度覆盖 agent 设置的问题；已创建任务的冻结配置不追溯修改。
 
@@ -59,6 +59,7 @@ python plugins/taixu-codex-bridge/tests/check_package.py
 python plugins/taixu-codex-bridge/tests/check_selection.py
 python plugins/taixu-codex-bridge/tests/check_usage.py
 python plugins/taixu-codex-bridge/tests/check_diagnostics.py
+python plugins/taixu-codex-bridge/tests/check_platform.py
 python plugins/taixu-codex-bridge/tests/check_streaming.py
 python plugins/taixu-codex-bridge/tests/check_onboarding.py
 CODEX_TEST_RUNTIME=/absolute/path/to/native/codex python plugins/taixu-codex-bridge/tests/check_runtime.py
@@ -84,6 +85,8 @@ Runtime 检查使用临时 HOME 和本地合成服务，不读取个人登录、
 
 - 账户：通过官方 `account/rateLimits/read` 读取实际 CLI 登录账户的额度窗口、重置时间与 credits 余额；这与该账户其他设备共享，不是人民币或本插件独享余额。不可用时显示未知。
 - 本机：按模型汇总保留调用记录中的输入、输出、缓存、推理 token，显示有记录/总调用次数及缺失数量。它可能包含历史登录账户的调用；只汇总 Runtime 返回的记录，不作为官方完整账单。缓存和推理为子集，不重复加进总量。
+- 近期调用：展示最近 50 次记录的时间、模型、推理强度、插件版本、耗时、状态及用量。没有 agent/章节关联标识的请求不会猜测归属；历史记录缺失的字段显示未知。
+- 0.3.10 起使用每个独立 Runtime 线程报告的累计用量，计入工具参数纠正带来的再次生成，并收集工具交回或取消收尾时到达的用量通知。旧记录可能只记了最后一次生成，保留原值并标注；失败/中断时的已报告用量仍可能不完整。
 - 刷新不发送模型生成请求。生成期间仍可看本机统计，账户查询需等当前节点结束。
 
 可选页面检查（需已有 Playwright）：`node plugins/taixu-codex-bridge/tests/check_usage_ui.cjs`；可用 `CHROME_PATH` 指定浏览器可执行文件。
@@ -99,7 +102,7 @@ Runtime 检查使用临时 HOME 和本地合成服务，不读取个人登录、
 ## 维护、权限和清理
 
 
-维护仓库与问题反馈：[dongxiaojv-create/determinflow-codex-bridge](https://github.com/dongxiaojv-create/determinflow-codex-bridge/issues)。本次社区包来自作者仓库 commit `6bfe221825dacecff9c91b583e8eb9bdab99f388`，运行代码未改动，仅补充社区要求的资源命名空间声明、目录材料和调整测试路径。
+维护仓库与问题反馈：[dongxiaojv-create/determinflow-codex-bridge](https://github.com/dongxiaojv-create/determinflow-codex-bridge/issues)。本次社区包来自作者仓库 commit `97aa5f8d98c0143cdb1fc148738691a2a6c12030`，运行代码未改动，仅补充社区要求的资源命名空间声明、目录材料和调整测试路径。
 
 - 外部通信：官方 Runtime 访问 OpenAI / ChatGPT 服务（包括 `chatgpt.com`、`api.openai.com`、`auth.openai.com`；具体子域和端点由固定 Runtime 决定），以及用户可选的 HTTP(S) 代理。安装组件从 registry.npmjs.org 下载固定官方包；管理页请求本机回环接口。本插件没有作者托管的转发服务或遥测端点。
 - 读取：CLI 可执行文件及配套 code-mode-host，用 SHA256 校验；读取 Codex 配置，由官方 Runtime 使用当前用户的登录存储。模型输入包含用户消息、历史、工具结果等任务上下文。
