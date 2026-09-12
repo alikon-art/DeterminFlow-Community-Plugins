@@ -2,7 +2,7 @@
 
 在 DeterminFlow 中使用**你自己登录的官方 Codex CLI 账户**。通过插件仓库安装，不需要 Codex 桌面应用，不提供共享账户或共享额度。
 
-**0.3.5 预览版：仅 macOS Apple Silicon。** 基于 DeterminFlow Desktop 1.1.0 / Core `9db9d98c` 的扩展接口，固定官方 Codex CLI `0.153.4`。其他 Core、CLI 版本、Intel Mac、Windows、Linux 尚未验收。此项目不是 OpenAI 或 DeterminFlow 官方插件。
+**0.3.6 预览版：仅 macOS Apple Silicon。** 基于 DeterminFlow Desktop 1.1.0 / Core `9db9d98c` 的扩展接口，固定官方 Codex CLI `0.153.4`。其他 Core、CLI 版本、Intel Mac、Windows、Linux 尚未验收。此项目不是 OpenAI 或 DeterminFlow 官方插件。
 
 工作流推理强度优先级：任务显式覆盖 → agent 自身设置 → Main 默认 → `high`。0.3.1 修复了 Main 强度覆盖 agent 设置的问题；已创建任务的冻结配置不追溯修改。
 
@@ -33,6 +33,8 @@ Bridge 使用当前系统用户的 `CODEX_HOME`（默认 `~/.codex`）；凭据�
 
 本插件仅提供回环接口，并给模型接口配置每次启动随机生成的通行证。插件与 DeterminFlow 共享系统权限，不是同机恶意软件的安全隔离层。请求内容会发送到 OpenAI；本地插件数据还会保存模型结果、工具参数、用量和失败状态，分享故障资料前需脱敏。
 
+本地 HTTPS 的证书信任只交给桥接器专用客户端；不改写 DeterminFlow 进程的代理或 `SSL_CERT_FILE`，不修改系统代理、系统证书库或 Codex 用户配置。
+
 官方资料：[Codex 认证](https://developers.openai.com/codex/auth/) · [固定版本发布](https://github.com/openai/codex/releases/tag/rust-v0.153.4)
 
 ## 能力与限制
@@ -62,6 +64,8 @@ CODEX_TEST_RUNTIME=/absolute/path/to/native/codex python plugins/taixu-codex-bri
 
 Runtime 检查使用临时 HOME 和本地合成服务，不读取个人登录、不调用官方模型。发布验证范围见 [VALIDATION.md](VALIDATION.md)；第二台真实电脑安装和真实账户调用尚待验证。
 
+`plugins/taixu-codex-bridge/tests/check_onboarding.py` 在设置 `CODEX_TEST_RUNTIME` 后还检查桌面生命周期脚本入口；可设置 `DETERMINFLOW_DESKTOP_PYTHON` 为实际桌面版内置后端，直接验证冻结运行环境。
+
 ## 许可
 
 插件代码采用 [MIT](LICENSE)。官方 Codex CLI 和 DeterminFlow 使用各自的许可；本仓库不分发其二进制或源码。
@@ -87,11 +91,11 @@ Runtime 检查使用临时 HOME 和本地合成服务，不读取个人登录、
 ## 维护、权限和清理
 
 
-维护仓库与问题反馈：[dongxiaojv-create/determinflow-codex-bridge](https://github.com/dongxiaojv-create/determinflow-codex-bridge/issues)。本次社区包来自作者仓库 commit `42eebf1`，运行代码未改动，仅补充社区要求的资源命名空间声明、目录材料和调整测试路径。
+维护仓库与问题反馈：[dongxiaojv-create/determinflow-codex-bridge](https://github.com/dongxiaojv-create/determinflow-codex-bridge/issues)。本次社区包来自作者仓库 commit `cb7f03637adb8ffaecc32dfacedff4b92c5f2690`，运行代码未改动，仅补充社区要求的资源命名空间声明、目录材料和调整测试路径。
 
 - 外部通信：官方 Runtime 访问 OpenAI / ChatGPT 服务（包括 `chatgpt.com`、`api.openai.com`、`auth.openai.com`；具体子域和端点由固定 Runtime 决定），以及用户可选的 HTTP(S) 代理。安装组件从 registry.npmjs.org 下载固定官方包；管理页请求本机回环接口。本插件没有作者托管的转发服务或遥测端点。
 - 读取：CLI 可执行文件及配套 code-mode-host，用 SHA256 校验；读取 Codex 配置，由官方 Runtime 使用当前用户的登录存储。模型输入包含用户消息、历史、工具结果等任务上下文。
-- 写入：插件私有数据目录中的 TLS 证书与私钥、自动下载的固定 Runtime、安装锁、登录提示标记、目录缓存、请求结果、用量、临时文件和运行诊断。不会把账户/额度接口的完整响应或登录令牌写入日志。代码会注册自身 Provider，并为 Core 当前进程设置本地 TLS 信任文件；不改变系统信任库。
+- 写入：插件私有数据目录中的 TLS 证书与私钥、自动下载的固定 Runtime、安装锁、登录提示标记、目录缓存、请求结果、用量、临时文件和运行诊断。不会把账户/额度接口的完整响应或登录令牌写入日志。代码会注册自身 Provider，并仅为桥接器专用 HTTP 客户端设置本地 TLS 信任；不改写 Core 进程代理或证书环境变量，不改变系统信任库。
 - 子进程：启动插件准备或用户指定的固定版本 Codex `app-server` 及官方 `login` 浏览器授权流程，模型调用使用独立进程；停止时会终止其子进程。业务工具由 DeterminFlow 执行。
 - 依赖：Python 3.11+，兼容 Core 提供 `httpx fastapi uvicorn cryptography certifi jsonschema`；macOS Apple Silicon；首次启用自动下载并校验官方 Codex 0.153.4，无需用户安装 Node/npm。Python 依赖由宿主提供。页面无远程脚本或字体依赖。
 - 升级不迁移书库；重启生效。失败时可使用 DeterminFlow 的插件回滚，回到同一来源的历史 revision 后重启。不同 Git 来源不能当作同一插件直接更新；从作者仓库改为社区来源前请备份并按宿主卸载/安装流程处理。
