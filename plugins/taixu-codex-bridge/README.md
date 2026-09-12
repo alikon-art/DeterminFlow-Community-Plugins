@@ -10,8 +10,8 @@
 
 1. 在 DeterminFlow「插件 → 添加仓库」填入：
 
-   - 名称：`DeterminFlow Codex Bridge`
-   - Git 仓库地址：`https://github.com/dongxiaojv-create/determinflow-codex-bridge.git`
+   - 名称：`DeterminFlow Community Plugins`
+   - Git 仓库地址：`https://github.com/alikon-art/DeterminFlow-Community-Plugins.git`
    - 分支或标签：`main`
 
 2. 保存并拉取，选择 **Codex Bridge**，确认第三方权限后安装、启用，按宿主提示重启一次。
@@ -55,25 +55,25 @@ Bridge 使用当前系统用户的 `CODEX_HOME`（默认 `~/.codex`）；凭据�
 Python 3.11+；检查依赖为 `httpx fastapi uvicorn cryptography certifi jsonschema`，运行时由兼容的 DeterminFlow 环境提供。
 
 ```sh
-python tests/check_package.py
-python tests/check_selection.py
-python tests/check_usage.py
-python tests/check_diagnostics.py
-python tests/check_platform.py
-python tests/check_streaming.py
-python tests/check_onboarding.py
-CODEX_TEST_RUNTIME=/absolute/path/to/native/codex python tests/check_runtime.py
-CODEX_TEST_RUNTIME=/absolute/path/to/native/codex python tests/check_runtime_streaming.py
-CODEX_TEST_RUNTIME=/absolute/path/to/native/codex python tests/check_runtime.py --json-output
-CODEX_TEST_RUNTIME=/absolute/path/to/native/codex python tests/check_runtime.py --validation-feedback
-CODEX_TEST_RUNTIME=/absolute/path/to/native/codex python tests/check_runtime.py --validation-feedback --invalid-again
+python plugins/taixu-codex-bridge/tests/check_package.py
+python plugins/taixu-codex-bridge/tests/check_selection.py
+python plugins/taixu-codex-bridge/tests/check_usage.py
+python plugins/taixu-codex-bridge/tests/check_diagnostics.py
+python plugins/taixu-codex-bridge/tests/check_platform.py
+python plugins/taixu-codex-bridge/tests/check_streaming.py
+python plugins/taixu-codex-bridge/tests/check_onboarding.py
+CODEX_TEST_RUNTIME=/absolute/path/to/native/codex python plugins/taixu-codex-bridge/tests/check_runtime.py
+CODEX_TEST_RUNTIME=/absolute/path/to/native/codex python plugins/taixu-codex-bridge/tests/check_runtime_streaming.py
+CODEX_TEST_RUNTIME=/absolute/path/to/native/codex python plugins/taixu-codex-bridge/tests/check_runtime.py --json-output
+CODEX_TEST_RUNTIME=/absolute/path/to/native/codex python plugins/taixu-codex-bridge/tests/check_runtime.py --validation-feedback
+CODEX_TEST_RUNTIME=/absolute/path/to/native/codex python plugins/taixu-codex-bridge/tests/check_runtime.py --validation-feedback --invalid-again
 ```
 
 Runtime 检查使用临时 HOME 和本地合成服务，不读取个人登录、不调用官方模型。发布验证范围见 [VALIDATION.md](VALIDATION.md)；第二台真实电脑安装和真实账户调用尚待验证。
 
-可设置 `DETERMINFLOW_CORE_ROOT` 为本地 Core 源码目录，再运行 `tests/check_streaming.py`，验证真实 SDK/Core 对流中错误的重试抑制、空分块和停止时关闭连接。
+可设置 `DETERMINFLOW_CORE_ROOT` 为本地 Core 源码目录，再运行 `plugins/taixu-codex-bridge/tests/check_streaming.py`，验证真实 SDK/Core 对流中错误的重试抑制、空分块和停止时关闭连接。
 
-`tests/check_onboarding.py` 在设置 `CODEX_TEST_RUNTIME` 后还检查桌面生命周期脚本入口；可设置 `DETERMINFLOW_DESKTOP_PYTHON` 为实际桌面版内置后端，直接验证冻结运行环境。
+`plugins/taixu-codex-bridge/tests/check_onboarding.py` 在设置 `CODEX_TEST_RUNTIME` 后还检查桌面生命周期脚本入口；可设置 `DETERMINFLOW_DESKTOP_PYTHON` 为实际桌面版内置后端，直接验证冻结运行环境。
 
 ## 许可
 
@@ -89,7 +89,7 @@ Runtime 检查使用临时 HOME 和本地合成服务，不读取个人登录、
 - 0.3.10 起使用每个独立 Runtime 线程报告的累计用量，计入工具参数纠正带来的再次生成，并收集工具交回或取消收尾时到达的用量通知。旧记录可能只记了最后一次生成，保留原值并标注；失败/中断时的已报告用量仍可能不完整。
 - 刷新不发送模型生成请求。生成期间仍可看本机统计，账户查询需等当前节点结束。
 
-可选页面检查（需已有 Playwright）：`node tests/check_usage_ui.cjs`；可用 `CHROME_PATH` 指定浏览器可执行文件。
+可选页面检查（需已有 Playwright）：`node plugins/taixu-codex-bridge/tests/check_usage_ui.cjs`；可用 `CHROME_PATH` 指定浏览器可执行文件。
 
 ### 故障定位与发布检查
 
@@ -98,3 +98,17 @@ Runtime 检查使用临时 HOME 和本地合成服务，不读取个人登录、
 [自动检查](https://github.com/dongxiaojv-create/determinflow-codex-bridge/actions/workflows/check.yml) 在每次推送和 PR 上运行固定 Runtime 的合成生成、JSON、工具交回以及离线错误/取消测试。发布前检查对应提交全部通过；绿色检查不替代第二台电脑和真实账户验收。
 
 运行组件下载源为 `registry.npmjs.org/@openai/codex` 的固定 0.153.4 Apple Silicon 包。插件不把二进制或登录凭据提交到仓库；官方组件的许可证见 [Codex 源码许可证](https://github.com/openai/codex/blob/rust-v0.153.4/LICENSE)。插件数据目录增加固定版本运行组件、安装锁、模型目录和一次性登录提示标记；卸载时由宿主的数据保留/删除策略处理。登录使用的用户 Codex 凭据不会随运行组件一起删除。
+
+## 维护、权限和清理
+
+
+维护仓库与问题反馈：[dongxiaojv-create/determinflow-codex-bridge](https://github.com/dongxiaojv-create/determinflow-codex-bridge/issues)。本次社区包来自作者仓库 commit `97aa5f8d98c0143cdb1fc148738691a2a6c12030`，运行代码未改动，仅补充社区要求的资源命名空间声明、目录材料和调整测试路径。
+
+- 外部通信：官方 Runtime 访问 OpenAI / ChatGPT 服务（包括 `chatgpt.com`、`api.openai.com`、`auth.openai.com`；具体子域和端点由固定 Runtime 决定），以及用户可选的 HTTP(S) 代理。安装组件从 registry.npmjs.org 下载固定官方包；管理页请求本机回环接口。本插件没有作者托管的转发服务或遥测端点。
+- 读取：CLI 可执行文件及配套 code-mode-host，用 SHA256 校验；读取 Codex 配置，由官方 Runtime 使用当前用户的登录存储。模型输入包含用户消息、历史、工具结果等任务上下文。
+- 写入：插件私有数据目录中的 TLS 证书与私钥、自动下载的固定 Runtime、安装锁、登录提示标记、目录缓存、请求结果、用量、临时文件和运行诊断。不会把账户/额度接口的完整响应或登录令牌写入日志。代码会注册自身 Provider，并仅为桥接器专用 HTTP 客户端设置本地 TLS 信任；不改写 Core 进程代理或证书环境变量，不改变系统信任库。
+- 子进程：启动插件准备或用户指定的固定版本 Codex `app-server` 及官方 `login` 浏览器授权流程，模型调用使用独立进程；停止时会终止其子进程。业务工具由 DeterminFlow 执行。
+- 依赖：Python 3.11+，兼容 Core 提供 `httpx fastapi uvicorn cryptography certifi jsonschema`；macOS Apple Silicon；首次启用自动下载并校验官方 Codex 0.153.4，无需用户安装 Node/npm。Python 依赖由宿主提供。页面无远程脚本或字体依赖。
+- 升级不迁移书库；重启生效。失败时可使用 DeterminFlow 的插件回滚，回到同一来源的历史 revision 后重启。不同 Git 来源不能当作同一插件直接更新；从作者仓库改为社区来源前请备份并按宿主卸载/安装流程处理。
+- 卸载：先等待调用结束，禁用或卸载插件并重启。确认不再需要历史结果后，再删除宿主用户数据目录下 `data/plugins/data/taixu-codex-bridge`；若宿主保留了 Codex Bridge Provider，也从模型配置中移除。卸载不会执行 `codex logout` 或删除共享的 `~/.codex` 登录存储。
+- 第三方来源：插件为作者以 MIT 许可发布的代码；无捆绑字体、媒体、模型权重、Core 源码或 Codex 二进制。第三方依赖由其各自许可证约束。
