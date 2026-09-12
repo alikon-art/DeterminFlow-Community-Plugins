@@ -3,7 +3,7 @@ import asyncio,hashlib,json,os,shutil,subprocess,sys,tempfile,threading,uuid
 from http.server import BaseHTTPRequestHandler,ThreadingHTTPServer
 from pathlib import Path
 ROOT=Path(__file__).resolve().parent
-ROOT=ROOT.parent
+ROOT=ROOT.parents[2]
 sys.path.insert(0,str(ROOT/'plugins/taixu-codex-bridge'))
 from determinflow_codex_bridge import bridge_native as native
 from determinflow_codex_bridge.bridge_contract import validate_chat,chat_sse

@@ -1,7 +1,7 @@
 """Offline usage regression: missing != zero, legacy fallback, no double counting."""
 import ast,inspect,json,sys,tempfile
 from pathlib import Path
-sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'plugins/taixu-codex-bridge'))
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from determinflow_codex_bridge.usage import local_usage,account_limits
 from determinflow_codex_bridge.bridge_native import DIRECTORY_METHODS
 from determinflow_codex_bridge import bridge_native
